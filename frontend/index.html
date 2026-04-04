@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link rel="stylesheet" href="./src/styles.css">
+  <script src="./javascript/main.js" type="module"></script>
+</head>
+<body>
+  <div class="content">
+    <div id="interface-list"></div>
+
+    <div class="wrapper centered" id="start-page">
+      <div class="head">
+        <img src="./src/assets/icon.png" class="icon" draggable="false">
+        <label class="name">GreyWest</label>
+
+        <h1 class="text">Выбери сетевой интерфейс, чтобы начать просматривать пакеты</h1>
+      </div>
+    </div>
+
+    <div class="wrapper" id="monitoring-page" style="display: none;">
+      <div class="packet-container">
+        <div class="table-header">
+          <span class="col-protocol">Протокол</span>
+          <span class="col-source">Источник</span>
+          <span class="col-destination">Назначение</span>
+          <span class="col-length">Размер</span>
+        </div>
+        
+        <div id="packet-list"></div>
+      </div>
+
+      <div class="options-container">
+        <label class="chbx-wrapper">
+          <input type="checkbox" id="packet-auto-scroll" checked>
+          <span>Авто прокрутка</span>
+        </label>
+
+        <button id="open-monitoring-settings">Настройки</button>
+      </div>
+
+      <div class="meta-container">
+        <div>Общее число пакетов: <span id="total-packet-count">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="surface" id="monitoring-settings" style="display: none;">
+    <div class="wrapper">
+      <button class="close-btn min" id="close-monitoring-settings">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+          <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+        </svg>
+      </button>
+
+      <div class="monitoring-settings">
+        <div class="section">
+          <h1 class="name">Фильтрация</h1>
+
+          <div class="settings">
+            <div class="iwr">
+              <span>Протокол пакета:</span>
+              <input id="filter-protocol" placeholder="udp / ipv4">
+            </div>
+
+            <div class="iwr">
+              <span>Адрес источника:</span>
+              <input id="filter-src-ip" placeholder="8.8.8.8">
+            </div>
+
+            <div class="iwr">
+              <span>Адрес назначения:</span>
+              <input id="filter-dst-ip" placeholder="1.1.1.1">
+            </div>
+          </div>
+
+          <button id="apply-filter">Применить</button>
+        </div>
+
+        <div class="section">
+          <h1 class="name">Сохранение</h1>
+
+          <div class="settings">
+            <div class="iwr large">
+              <span>Директория:</span>
+              <input id="saver-directory" placeholder="/home/nullclyze/GreyWest/">
+            </div>
+
+            <div class="iwr large">
+              <span>Имя файла:</span>
+              <input id="saver-filename" placeholder="packets" value="packets">
+            </div>
+          </div>
+
+          <button id="apply-saver">Применить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
