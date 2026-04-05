@@ -69,6 +69,9 @@ fn process_ipv4(ipv4: &Ipv4Packet, packet_info: &mut NetworkPacket) {
     IpNextHeaderProtocols::Icmp => {
       packet_info.protocol = "ICMPv4".to_string();
     }
+    IpNextHeaderProtocols::Igmp => {
+      packet_info.protocol = "IGMPv4".to_string();
+    }
     _ => {
       packet_info.protocol = format!("{} / IPv4", ipv4.get_next_level_protocol());
     }
@@ -88,8 +91,11 @@ fn process_ipv6(ipv6: &Ipv6Packet, packet_info: &mut NetworkPacket) {
     IpNextHeaderProtocols::Udp => {
       packet_info.protocol = "UDP / IPv6".to_string();
     }
-    IpNextHeaderProtocols::Icmpv6 => {
+    IpNextHeaderProtocols::Icmp | IpNextHeaderProtocols::Icmpv6  => {
       packet_info.protocol = "ICMPv6".to_string();
+    }
+    IpNextHeaderProtocols::Igmp => {
+      packet_info.protocol = "IGMPv6".to_string();
     }
     _ => {
       packet_info.protocol = format!("{} / IPv6", ipv6.get_next_header());
