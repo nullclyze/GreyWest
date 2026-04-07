@@ -9,7 +9,7 @@ use tokio::task::JoinHandle;
 
 use crate::emit::emit::{EmitEvent, EMITTER};
 use crate::network::filter::PACKET_FILTER;
-use crate::network::interface::find_interfaces;
+use crate::network::interface::INTERFACES;
 use crate::network::parser::process_packet;
 use crate::network::saver::AUTO_SAVER;
 
@@ -23,13 +23,15 @@ pub async fn start_packet_sniffing(selected_interface: usize) {
   stop_packet_sniffing().await;
 
   let handle = tokio::spawn(async move {
-    let interfaces = find_interfaces();
+    let guard = INTERFACES.read().await;
 
-    if selected_interface >= interfaces.len() {
+    if selected_interface >= guard.len() {
       return;
     }
 
-    let interface_name = interfaces[selected_interface].name.clone();
+    let interface_name = guard[selected_interface].name.clone();
+
+    drop(guard);
 
     SNIFFING_ACTIVE.store(true, Ordering::Relaxed);
 

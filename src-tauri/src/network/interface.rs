@@ -1,5 +1,11 @@
+use std::sync::Arc;
+
+use once_cell::sync::Lazy;
 use pcap::Device;
 use serde::Serialize;
+use tokio::sync::RwLock;
+
+pub static INTERFACES: Lazy<Arc<RwLock<Vec<NetworkInterface>>>> = Lazy::new(|| Arc::new(RwLock::new(Vec::new())));
 
 #[derive(Serialize, Clone, Debug)]
 pub struct NetworkInterface {
@@ -9,8 +15,8 @@ pub struct NetworkInterface {
   pub addresses: Vec<String>,
 }
 
-/// Функция поиска доступных интерфейсов
-pub fn find_interfaces() -> Vec<NetworkInterface> {
+/// Функция обновления интерфейсов
+pub async fn refresh_interfaces() {
   match Device::list() {
     Ok(devices) => {
       let mut interfaces = Vec::new();
@@ -37,8 +43,9 @@ pub fn find_interfaces() -> Vec<NetworkInterface> {
         interfaces.push(interface);
       }
 
-      interfaces
+      let mut guard = INTERFACES.write().await;
+      guard.extend(interfaces);
     }
-    Err(_) => Vec::new(),
+    Err(_) => {},
   }
 }

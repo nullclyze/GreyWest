@@ -2,7 +2,7 @@ use std::thread;
 
 use crate::emit::emit::{emit_event_loop, EmitEvent, EMITTER};
 use crate::network::filter::{PacketFilter, PACKET_FILTER};
-use crate::network::interface::find_interfaces;
+use crate::network::interface::{INTERFACES, refresh_interfaces};
 use crate::network::saver::{AutoSaver, AUTO_SAVER};
 use crate::network::sniffer::{start_packet_sniffing, stop_packet_sniffing, TOTAL_PACKET_COUNT};
 
@@ -11,9 +11,9 @@ mod network;
 
 /// Функция обновления доступных сетевых интерфейсов
 #[tauri::command]
-fn refresh_available_interfaces() {
-  let interfaces = find_interfaces();
-  EMITTER.emit(EmitEvent::AvailableInterfaces(interfaces));
+async fn refresh_available_interfaces() {
+  refresh_interfaces().await;
+  EMITTER.emit(EmitEvent::AvailableInterfaces(INTERFACES.read().await.clone()));
 }
 
 /// Команда запуска сниффинга пакетов
