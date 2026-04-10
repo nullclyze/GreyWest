@@ -52,9 +52,9 @@ pub async fn start_packet_sniffing(selected_interface: usize) {
     while SNIFFING_ACTIVE.load(Ordering::Relaxed) {
       match capture.next_packet() {
         Ok(packet) => {
-          let packet_info = process_packet(packet.data);
+          let (identified, packet_info) = process_packet(packet.data);
 
-          if !packet_info.identified {
+          if !identified {
             continue;
           }
 

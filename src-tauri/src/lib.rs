@@ -42,12 +42,13 @@ async fn apply_packet_filter(protocol: String, src_ip: String, dst_ip: String) {
 
 /// Команда применения авто сохранения
 #[tauri::command]
-async fn apply_auto_saver(directory: String, filename: String) {
+async fn apply_auto_saver(directory: String, filename: String, filetype: i32) {
   let mut guard = AUTO_SAVER.write().await;
 
   *guard = AutoSaver {
     directory: directory,
     filename: filename,
+    filetype: filetype
   };
 }
 

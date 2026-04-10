@@ -9,7 +9,6 @@ pub struct NetworkPacket {
   pub src_ip: String,
   #[serde(rename = "dstIp")]
   pub dst_ip: String,
-  pub identified: bool,
 }
 
 impl Default for NetworkPacket {
@@ -20,7 +19,6 @@ impl Default for NetworkPacket {
       protocol: "Unknown".to_string(),
       src_ip: "-".to_string(),
       dst_ip: "-".to_string(),
-      identified: false,
     }
   }
 }

@@ -16,6 +16,7 @@ pub static AUTO_SAVER: Lazy<Arc<RwLock<AutoSaver>>> =
 pub struct AutoSaver {
   pub directory: String,
   pub filename: String,
+  pub filetype: i32
 }
 
 impl AutoSaver {
@@ -33,12 +34,19 @@ impl AutoSaver {
       }
     }
 
-    let file_path = dir_path.join(format!("{}.txt", self.filename));
+    if self.filetype == 0 || self.filetype == -1 {
+      self.save_as_txt(dir_path.join(format!("{}.txt", self.filename)), packet);
+    } else if self.filetype == 1 {
+      self.save_as_json(dir_path.join(format!("{}.json", self.filename)), packet);
+    }
+  }
 
+  /// Метод сохранения данных пакета в TXT файл
+  fn save_as_txt(&self, path: PathBuf, packet: &NetworkPacket) {
     let mut file = match OpenOptions::new()
       .create(true)
       .append(true)
-      .open(&file_path)
+      .open(&path)
     {
       Ok(f) => f,
       Err(_) => return,
@@ -55,5 +63,25 @@ impl AutoSaver {
     );
 
     let _ = file.write_all(data.as_bytes());
+  }
+
+  /// Метод сохранения данных пакета в JSON файл
+  fn save_as_json(&self, path: PathBuf, packet: &NetworkPacket) {
+    let old_data = fs::read_to_string(&path).unwrap_or_else(|_| "[]".to_string());
+
+    let mut v: Vec<NetworkPacket> = serde_json::from_str(&old_data).unwrap_or_default();
+
+    v.push(packet.clone());
+
+    let pretty = serde_json::to_string_pretty(&v).expect("Failed to serialize string");
+
+    let mut file = OpenOptions::new()
+      .create(true)
+      .write(true)
+      .truncate(true)
+      .open(&path)
+      .expect("Failed to open file");
+
+    file.write_all(pretty.as_bytes()).expect("Failed to write data to file");
   }
 }

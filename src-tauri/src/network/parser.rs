@@ -10,7 +10,7 @@ use pnet::packet::{
 use crate::network::packet::{get_length_str, NetworkPacket};
 
 /// Функция обработки сетевого пакета
-pub fn process_packet(data: &[u8]) -> NetworkPacket {
+pub fn process_packet(data: &[u8]) -> (bool, NetworkPacket) {
   let length = data.len();
 
   let mut packet_info = NetworkPacket {
@@ -19,33 +19,35 @@ pub fn process_packet(data: &[u8]) -> NetworkPacket {
     protocol: "Unknown".to_string(),
     src_ip: "-".to_string(),
     dst_ip: "-".to_string(),
-    identified: false,
   };
+
+  let mut identified = false;
 
   if let Some(ethernet) = EthernetPacket::new(data) {
     match ethernet.get_ethertype() {
       EtherTypes::Ipv4 => {
         if let Some(ipv4) = Ipv4Packet::new(ethernet.payload()) {
           process_ipv4(&ipv4, &mut packet_info);
+          identified = true;
         }
       }
       EtherTypes::Ipv6 => {
         if let Some(ipv6) = Ipv6Packet::new(ethernet.payload()) {
           process_ipv6(&ipv6, &mut packet_info);
+          identified = true;
         }
       }
       _ => {}
     }
   }
 
-  packet_info
+  (identified, packet_info)
 }
 
 /// Функция извлечения данных из IPv4 пакета
 fn process_ipv4(ipv4: &Ipv4Packet, packet_info: &mut NetworkPacket) {
   packet_info.src_ip = ipv4.get_source().to_string();
   packet_info.dst_ip = ipv4.get_destination().to_string();
-  packet_info.identified = true;
 
   match ipv4.get_next_level_protocol() {
     IpNextHeaderProtocols::Tcp => {
@@ -82,7 +84,6 @@ fn process_ipv4(ipv4: &Ipv4Packet, packet_info: &mut NetworkPacket) {
 fn process_ipv6(ipv6: &Ipv6Packet, packet_info: &mut NetworkPacket) {
   packet_info.src_ip = ipv6.get_source().to_string();
   packet_info.dst_ip = ipv6.get_destination().to_string();
-  packet_info.identified = true;
 
   match ipv6.get_next_header() {
     IpNextHeaderProtocols::Tcp => {

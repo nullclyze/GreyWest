@@ -8,7 +8,6 @@ interface NetworkPacket {
 	protocol: string;
 	srcIp: string;
 	dstIp: string;
-  identified: boolean;
 }
 
 /** Структура данных сетевого интерфейса */
@@ -30,6 +29,7 @@ interface PacketFilter {
 interface AutoSaver {
   directory: string;
   filename: string;
+  filetype: number;
 }
 
 /** Последний выбранный индекс сетевого интерфейса */
@@ -114,17 +114,20 @@ const applyFilter = async () => {
 const applySaver = async () => {
   const directory = (document.getElementById("saver-directory") as HTMLInputElement).value;
   const filename = (document.getElementById("saver-filename") as HTMLInputElement).value;
+  const filetype = (document.getElementById("saver-filetype") as HTMLSelectElement).selectedIndex;
 
   let saver: AutoSaver = {
     directory: directory,
     filename: filename,
+    filetype: filetype
   };
 
   localStorage.setItem("auto-saver", JSON.stringify(saver));
 
   await invoke("apply_auto_saver", {
     directory: directory,
-    filename: filename
+    filename: filename,
+    filetype: filetype
   });
 }
 
@@ -152,6 +155,7 @@ const loadSaverOptions = async () => {
 
     (document.getElementById("saver-directory") as HTMLInputElement).value = autoSaver.directory;
     (document.getElementById("saver-filename") as HTMLInputElement).value = autoSaver.filename;
+    (document.getElementById("saver-filetype") as HTMLSelectElement).selectedIndex = autoSaver.filetype;
   }
 
   await applySaver();
