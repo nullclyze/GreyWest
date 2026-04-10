@@ -44,6 +44,7 @@ pub async fn refresh_interfaces() {
       }
 
       let mut guard = INTERFACES.write().await;
+      guard.clear();
       guard.extend(interfaces);
     }
     Err(_) => {},
