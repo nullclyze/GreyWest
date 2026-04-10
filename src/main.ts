@@ -167,37 +167,43 @@ const refreshInterfacesHandler = (event: Event<unknown>) => {
 
   if (interfaces.length === 0) return;
 
+  let index = 0;
+
   for (const iface of interfaces) {  
-    const ifaceEl = document.createElement("div");
-    ifaceEl.className = "interface";
-    ifaceEl.setAttribute("interface-idx", iface.index.toString());
+    index++;
 
-    const ifaceName = document.createElement("div");
-    ifaceName.className = "name";
-    ifaceName.innerText = iface.description;
+    setTimeout(() => {
+      const ifaceEl = document.createElement("div");
+      ifaceEl.className = "interface";
+      ifaceEl.setAttribute("interface-idx", iface.index.toString());
 
-    const ifaceAddresses = document.createElement("div");
-    ifaceAddresses.className = "addresses";
+      const ifaceName = document.createElement("div");
+      ifaceName.className = "name";
+      ifaceName.innerText = iface.description;
 
-    if (iface.addresses.length > 0) {
-      for (const addr of iface.addresses) {
-        const ifaceAddress = document.createElement("p");
-        ifaceAddress.innerText = addr;
-        ifaceAddresses.appendChild(ifaceAddress);
+      const ifaceAddresses = document.createElement("div");
+      ifaceAddresses.className = "addresses";
+
+      if (iface.addresses.length > 0) {
+        for (const addr of iface.addresses) {
+          const ifaceAddress = document.createElement("p");
+          ifaceAddress.innerText = addr;
+          ifaceAddresses.appendChild(ifaceAddress);
+        }
+      } else {
+        const ifaceNoAddr = document.createElement("p");
+        ifaceNoAddr.innerText = "Нету адресов";
+        ifaceAddresses.appendChild(ifaceNoAddr);
       }
-    } else {
-      const ifaceNoAddr = document.createElement("p");
-      ifaceNoAddr.innerText = "Нету адресов";
-      ifaceAddresses.appendChild(ifaceNoAddr);
-    }
 
-    ifaceEl.appendChild(ifaceName);
-    ifaceEl.appendChild(ifaceAddresses);
-    
-    interfaceList.appendChild(ifaceEl);
+      ifaceEl.appendChild(ifaceName);
+      ifaceEl.appendChild(ifaceAddresses);
+      
+      interfaceList.appendChild(ifaceEl);
+    }, 50 * index);
   }
 
-  updateInterfaces();
+  setTimeout(updateInterfaces, 50 * index);
 }
 
 /** Обработчик события "network-packet" */
@@ -258,8 +264,12 @@ export const setup = async () => {
 
   const monitoringSettings = document.getElementById("monitoring-settings") as HTMLDivElement;
 
+  document.getElementById("refresh-interfaces")?.addEventListener("click", async () => await invoke("refresh_available_interfaces"));
+
   document.getElementById("open-monitoring-settings")?.addEventListener("click", () => monitoringSettings.style.display = "flex");
   document.getElementById("close-monitoring-settings")?.addEventListener("click", () => monitoringSettings.style.display = "none");
+
+  document.getElementById("clear-monitoring")?.addEventListener("click", resetMonitoring);
 
   document.getElementById("apply-filter")?.addEventListener("click", applyFilter);
   document.getElementById("apply-saver")?.addEventListener("click", applySaver);
